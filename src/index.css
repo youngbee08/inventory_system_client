@@ -1,0 +1,94 @@
+@import url("https://fonts.googleapis.com/css2?family=Raleway:wght@300;400;500;600;700;800&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --color-primary: #3f5fc7;
+  --color-secondary: #fbfcff;
+  --color-tetiary: #eef3ff;
+  --color-tertiary: #eef3ff;
+  --color-fadedBlack: #a6afc4;
+  --color-outlineBlack: #dfe5f2;
+  --color-backgroundBlack: #f7f9ff33;
+  --color-tableHeading: #2e3445;
+  --color-tableData: #6f778a;
+  --color-tempBgGreen: #f4f6ff;
+  --color-tempLineGreen: #d9e1f5;
+  --color-tableBorder: #edf1f7;
+}
+
+* {
+  font-family: "Raleway", sans-serif;
+  font-style: normal;
+}
+body {
+  @apply bg-primary/30 text-tableData antialiased;
+}
+
+.no-scrollbar::-webkit-scrollbar {
+  @apply hidden;
+}
+
+.styled-scrollbar::-webkit-scrollbar {
+  @apply w-1 h-1;
+}
+
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  @apply bg-primary/30 rounded-full;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
+:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.action-btn {
+  background: linear-gradient(100.65deg, #3f5fc7 7.92%, #7d8ff0 265.65%);
+}
+
+.row-checkbox {
+  @apply appearance-none border border-tableBorder bg-secondary relative;
+}
+
+.row-checkbox:before {
+  content: "";
+  @apply absolute w-full h-full bg-primary rounded-[inherit] hidden;
+}
+
+.row-checkbox:after {
+  content: "";
+  border-width: 0 3px 3px 0;
+  @apply absolute top-1/2 -translate-1/2 -mt-0.5 left-1/2 w-[7px] h-3 border-white rotate-45 hidden;
+}
+
+.row-checkbox:checked:after,
+.row-checkbox:checked:before {
+  @apply block;
+}
+
+.nav-active {
+  color: #3f5fc7; /* optional if not handled elsewhere */
+  font-weight: 600;
+  position: relative;
+}
+
+.nav-active::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  height: 2rem; /* same as h-8 */
+  width: 3px;
+  background-color: var(--primary); /* or your hex */
+  border-radius: 0 6px 6px 0;
+}
