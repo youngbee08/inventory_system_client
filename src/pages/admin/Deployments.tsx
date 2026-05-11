@@ -15,6 +15,9 @@ import api, { getErrorMessage } from "../../helpers/api";
 import ActionCell from "../../components/common/ActionCell";
 import EditDeploymentDialog from "../../components/modals/EditDeploymentDialog";
 import { useNavigate } from "react-router-dom";
+import { TbTruckOff } from "react-icons/tb";
+import ConfirmDialog from "../../components/modals/ConfirmDialog";
+import { toast } from "sonner";
 
 interface DeploymentsProps {
   isRecent?: boolean;
@@ -43,6 +46,8 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
   const [selectdeDeployment, setSelectedDeployment] =
     useState<Deployment | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCancelModal, setShowCancelModal] = useState(false);
+  const [cancelingDeployment, setCancelingDeployment] = useState(false);
 
   const columns: TableColumnProps<Deployment>[] = [
     {
@@ -93,6 +98,17 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
                 toggleAction={() => setSelectedDeployment(deployment)}
                 onEdit={() => setShowEditModal(true)}
                 onView={() => navigate(`${deployment._id}`)}
+                otherAction={
+                  deployment.status === "cancelled" ||
+                  deployment.status === "completed"
+                    ? null
+                    : {
+                        label: "Cancel",
+                        icon: TbTruckOff,
+                        isDanger: true,
+                        action: () => setShowCancelModal(true),
+                      }
+                }
               />
             ),
           },
@@ -100,11 +116,39 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
       : []),
   ];
 
+  const reFetchDeployment = async () => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.get("/deployments");
+      setDeployments(res.data.deployments ?? []);
+    } catch (err: unknown) {
+      setError(getErrorMessage(err, "Failed to load deployments"));
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const cancelDeployment = async () => {
+    setCancelingDeployment(true);
+    try {
+      const res = await api.patch(
+        `/deployments/${selectdeDeployment?._id}/cancel`,
+      );
+      toast.success(res.data.message || "Deployment cancelled successfully");
+      reFetchDeployment();
+      setShowCancelModal(false);
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to cancel deployments"));
+    } finally {
+      setCancelingDeployment(false);
+    }
+  };
+
   useEffect(() => {
     const fetchDeployments = async () => {
       setIsLoading(true);
       setError(null);
-
       try {
         const res = await api.get("/deployments");
         setDeployments(res.data.deployments ?? []);
@@ -172,6 +216,14 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
         isOpen={showEditModal}
         onCancel={() => setShowEditModal(false)}
         deployment={selectdeDeployment}
+      />
+      <ConfirmDialog
+        isOpen={showCancelModal}
+        title="Are you sure you want to cancel this deployment?"
+        message="Confirming this button will cancel this deployment permanently and won't be able to update any material status."
+        onCancel={() => setShowCancelModal(false)}
+        onConfirm={cancelDeployment}
+        isLoading={cancelingDeployment}
       />
     </>
   );

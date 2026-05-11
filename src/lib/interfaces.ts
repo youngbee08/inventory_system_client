@@ -7,8 +7,11 @@ export interface SafeUserProps {
 export interface UserProps extends SafeUserProps {
   email: string;
   role: string;
-  created_at: string;
-  updated_at: string;
+  created_at?: string;
+  updated_at?: string;
+  createdAt?: string;
+  updatedAt?: string;
+  __v?: number;
 }
 
 export interface UserContextType {
@@ -56,7 +59,20 @@ export type DeploymentMaterialStatus =
   | "cancelled";
 
 export interface DeploymentMaterial {
-  material: string;
+  material:
+    | string
+    | {
+        _id: string;
+        name: string;
+        quantity: number;
+        location: string;
+        threshold: number;
+        isActive: boolean;
+        unit: string;
+        createdAt: string;
+        updatedAt: string;
+        __v?: number;
+      };
   quantity: number;
   status: DeploymentMaterialStatus | string;
 }
@@ -65,7 +81,7 @@ export interface Deployment {
   _id: string;
   title: string;
   destination: string;
-  assignedTo: string | SafeUserProps;
+  assignedTo: string | UserProps;
   status: DeploymentStatus;
   materials: DeploymentMaterial[];
   createdAt: string;

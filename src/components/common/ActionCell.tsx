@@ -10,23 +10,32 @@ import {
   autoUpdate,
   FloatingPortal,
 } from "@floating-ui/react";
+import type { IconType } from "react-icons";
 
 interface ActionCellProps {
   rowId: number;
   rowItem?: object;
-  onEdit?: (id: number) => void; // ✅ optional
-  onDelete?: (id: number) => void; // ✅ optional
+  onEdit?: (id: number) => void;
+  onDelete?: (id: number) => void;
   toggleAction?: () => void;
-  onView?: (id: number) => void; // ✅ optional
+  onView?: (id: number) => void;
   canView?: boolean;
+  otherAction?: {
+    label: string;
+    action: () => void;
+    icon: IconType;
+    isDanger?: boolean;
+  } | null;
 }
 
 const ActionCell: React.FC<ActionCellProps> = ({
   rowId,
   onEdit,
+  otherAction,
   onDelete,
   onView,
   canView = false,
+  toggleAction,
 }) => {
   const [open, setOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -61,7 +70,10 @@ const ActionCell: React.FC<ActionCellProps> = ({
       <div
         ref={refs.setReference}
         className={`hover:bg-primary/10 w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer ${open ? "bg-primary/20" : ""}`}
-        onClick={() => setOpen(!open)}
+        onClick={() => {
+          setOpen(!open);
+          toggleAction?.();
+        }}
       >
         <TfiMore size={14} className="rotate-90 text-primary" />
       </div>
@@ -94,6 +106,17 @@ const ActionCell: React.FC<ActionCellProps> = ({
                 }}
               >
                 <FiEdit /> Edit
+              </button>
+            )}
+            {otherAction && (
+              <button
+                className={`flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer ${otherAction.isDanger && "text-red-600"} border-t border-gray-50`}
+                onClick={() => {
+                  otherAction.action();
+                  setOpen(false);
+                }}
+              >
+                <otherAction.icon /> {otherAction.label}
               </button>
             )}
             {onDelete && (

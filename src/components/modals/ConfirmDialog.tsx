@@ -26,26 +26,31 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
 
   return (
     <Modal onClose={onCancel}>
-      <div className="p-4 text-center">
-        <h4 className="text-xl font-semibold mb-4">{title}</h4>
-        <div className="mb-6">
-          {typeof message === "string" ? (
-            <p className="text-primary">{message}</p>
-          ) : (
-            message
-          )}
+      <div className="pr-2">
+        <div className="flex items-start gap-4">
+          <div>
+            <h4 className="text-sm lg:text-lg font-extrabold text-tableHeading">
+              {title}
+            </h4>
+            <div className="mt-2 text-xs lg:text-sm leading-6 text-tableData">
+              {typeof message === "string" ? <p>{message}</p> : message}
+            </div>
+          </div>
         </div>
-        <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
+
+        <div className="mt-7 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
           <button
+            type="button"
             onClick={onCancel}
-            className="w-full md:w-1/2 h-12.5 rounded-lg border border-gray-300 text-gray-600 hover:bg-gray-100 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-full items-center justify-center rounded-md border border-tableBorder bg-white px-4 text-xs font-bold text-tableHeading transition hover:bg-secondary cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             disabled={isLoading}
           >
             {cancelText}
           </button>
           <button
+            type="button"
             onClick={onConfirm}
-            className="w-full md:w-1/2 h-12.5 bg-primary text-white rounded-lg hover:bg-primary/90 transition cursor-pointer disabled:cursor-not-allowed disabled:opacity-50"
+            className="inline-flex h-10 w-full items-center justify-center rounded-md bg-red-600 px-4 text-xs font-bold text-white shadow-sm shadow-red-600/15 transition hover:bg-red-700 cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
             disabled={isLoading}
           >
             {isLoading ? "Please wait..." : confirmText}
