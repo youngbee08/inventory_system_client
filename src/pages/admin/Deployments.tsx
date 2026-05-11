@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import type React from "react";
 import { MdAdd } from "react-icons/md";
 import ReusableTable from "../../utility/ReuseableTable";
@@ -18,6 +18,7 @@ import { useNavigate } from "react-router-dom";
 import { TbTruckOff } from "react-icons/tb";
 import ConfirmDialog from "../../components/modals/ConfirmDialog";
 import { toast } from "sonner";
+import CreateDeploymentDialog from "../../components/modals/CreateDeploymentDialog";
 
 interface DeploymentsProps {
   isRecent?: boolean;
@@ -43,97 +44,110 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
   const [deployments, setDeployments] = useState<Deployment[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [selectdeDeployment, setSelectedDeployment] =
+  const [selectedDeployment, setSelectedDeployment] =
     useState<Deployment | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelingDeployment, setCancelingDeployment] = useState(false);
 
-  const columns: TableColumnProps<Deployment>[] = [
-    {
-      label: "Deployment Title",
-      key: "title",
-      className:
-        "px-4 py-4 text-xs font-bold text-tableHeading whitespace-nowrap",
-    },
-    {
-      label: "Assigned Employee",
-      key: "assignedTo",
-      render: (deployment) =>
-        getAssignedToLabel(deployment.assignedTo) || (
-          <p className="text-center">-</p>
-        ),
-    },
-    {
-      label: "Destination",
-      key: "destination",
-    },
-    {
-      label: "Status",
-      key: "status",
-      render: (deployment) => {
-        return (
-          <span
-            className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-bold ring-1 ${statusClasses[deployment.status]}`}
-          >
-            {formatUnderScores(deployment.status, true)}
-          </span>
-        );
-      },
-    },
-    {
-      label: "Created Date",
-      key: "createdAt",
-      render: (deployment) => formatISODateToCustom(deployment.createdAt),
-    },
-    ...(!isRecent
-      ? [
-          {
-            label: "Action",
-            key: "action",
-            render: (deployment: Deployment) => (
-              <ActionCell
-                rowId={6}
-                rowItem={deployment}
-                toggleAction={() => setSelectedDeployment(deployment)}
-                onEdit={() => setShowEditModal(true)}
-                onView={() => navigate(`${deployment._id}`)}
-                otherAction={
-                  deployment.status === "cancelled" ||
-                  deployment.status === "completed"
-                    ? null
-                    : {
-                        label: "Cancel",
-                        icon: TbTruckOff,
-                        isDanger: true,
-                        action: () => setShowCancelModal(true),
-                      }
-                }
-              />
-            ),
-          },
-        ]
-      : []),
-  ];
-
-  const reFetchDeployment = async () => {
+  const reFetchDeployment = useCallback(async () => {
     setIsLoading(true);
     setError(null);
     try {
       const res = await api.get("/deployments");
-      setDeployments(res.data.deployments ?? []);
+      setDeployments(res.data.deployments.reverse() ?? []);
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Failed to load deployments"));
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
+
+  const columns: TableColumnProps<Deployment>[] = useMemo(
+    () => [
+      {
+        label: "Deployment Title",
+        key: "title",
+        className:
+          "px-4 py-4 text-xs font-bold text-tableHeading whitespace-nowrap",
+      },
+      {
+        label: "Assigned Employee",
+        key: "assignedTo",
+        render: (deployment) =>
+          getAssignedToLabel(deployment.assignedTo) || (
+            <p className="text-center">-</p>
+          ),
+      },
+      {
+        label: "Destination",
+        key: "destination",
+      },
+      {
+        label: "Status",
+        key: "status",
+        render: (deployment) => {
+          return (
+            <span
+              className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-[10px] font-bold ring-1 ${statusClasses[deployment.status]}`}
+            >
+              {formatUnderScores(deployment.status, true)}
+            </span>
+          );
+        },
+      },
+      {
+        label: "Created Date",
+        key: "createdAt",
+        render: (deployment) => formatISODateToCustom(deployment.createdAt),
+      },
+      ...(!isRecent
+        ? [
+            {
+              label: "Action",
+              key: "action",
+              render: (deployment: Deployment) => (
+                <ActionCell
+                  rowId={deployment._id}
+                  rowItem={deployment}
+                  onEdit={() => {
+                    if (deployment.status === "completed") {
+                      toast.info("Can't update completed deployment");
+                    } else {
+                      setSelectedDeployment(deployment);
+                      setShowEditModal(true);
+                    }
+                  }}
+                  onView={() => navigate(`${deployment._id}`)}
+                  otherAction={
+                    deployment.status === "cancelled" ||
+                    deployment.status === "completed"
+                      ? null
+                      : {
+                          label: "Cancel",
+                          icon: TbTruckOff,
+                          isDanger: true,
+                          action: () => {
+                            setSelectedDeployment(deployment);
+                            setShowCancelModal(true);
+                          },
+                        }
+                  }
+                />
+              ),
+            },
+          ]
+        : []),
+    ],
+    [isRecent, navigate],
+  );
 
   const cancelDeployment = async () => {
     setCancelingDeployment(true);
     try {
       const res = await api.patch(
-        `/deployments/${selectdeDeployment?._id}/cancel`,
+        `/deployments/${selectedDeployment?._id}/cancel`,
       );
       toast.success(res.data.message || "Deployment cancelled successfully");
       reFetchDeployment();
@@ -146,21 +160,12 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
   };
 
   useEffect(() => {
-    const fetchDeployments = async () => {
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await api.get("/deployments");
-        setDeployments(res.data.deployments ?? []);
-      } catch (err: unknown) {
-        setError(getErrorMessage(err, "Failed to load deployments"));
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const timeoutId = window.setTimeout(() => {
+      void reFetchDeployment();
+    }, 0);
 
-    fetchDeployments();
-  }, []);
+    return () => window.clearTimeout(timeoutId);
+  }, [reFetchDeployment]);
 
   const displayedDeployments = isRecent ? deployments.slice(0, 4) : deployments;
 
@@ -181,6 +186,7 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
 
             <button
               type="button"
+              onClick={() => setShowCreateModal(true)}
               className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90 sm:w-auto"
             >
               <MdAdd size={17} />
@@ -214,14 +220,26 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
       </section>
       <EditDeploymentDialog
         isOpen={showEditModal}
-        onCancel={() => setShowEditModal(false)}
-        deployment={selectdeDeployment}
+        onCancel={() => {
+          setShowEditModal(false);
+          setSelectedDeployment(null);
+        }}
+        deployment={selectedDeployment}
+        onSuccess={reFetchDeployment}
+      />
+      <CreateDeploymentDialog
+        isOpen={showCreateModal}
+        onCancel={() => setShowCreateModal(false)}
+        onSuccess={reFetchDeployment}
       />
       <ConfirmDialog
         isOpen={showCancelModal}
         title="Are you sure you want to cancel this deployment?"
         message="Confirming this button will cancel this deployment permanently and won't be able to update any material status."
-        onCancel={() => setShowCancelModal(false)}
+        onCancel={() => {
+          setShowCancelModal(false);
+          setSelectedDeployment(null);
+        }}
         onConfirm={cancelDeployment}
         isLoading={cancelingDeployment}
       />

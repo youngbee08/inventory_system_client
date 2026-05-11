@@ -61,20 +61,22 @@ export type DeploymentMaterialStatus =
 export interface DeploymentMaterial {
   material:
     | string
-    | {
-        _id: string;
-        name: string;
-        quantity: number;
-        location: string;
-        threshold: number;
-        isActive: boolean;
-        unit: string;
-        createdAt: string;
-        updatedAt: string;
-        __v?: number;
-      };
+    | Material;
   quantity: number;
   status: DeploymentMaterialStatus | string;
+}
+
+export interface Material {
+  _id: string;
+  name: string;
+  quantity: number;
+  location: string;
+  threshold: number;
+  isActive: boolean;
+  unit: string;
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
 }
 
 export interface Deployment {

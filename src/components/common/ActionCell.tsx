@@ -13,12 +13,12 @@ import {
 import type { IconType } from "react-icons";
 
 interface ActionCellProps {
-  rowId: number;
+  rowId: number | string;
   rowItem?: object;
-  onEdit?: (id: number) => void;
-  onDelete?: (id: number) => void;
+  onEdit?: (id: number | string) => void;
+  onDelete?: (id: number | string) => void;
   toggleAction?: () => void;
-  onView?: (id: number) => void;
+  onView?: (id: number | string) => void;
   canView?: boolean;
   otherAction?: {
     label: string;
@@ -69,10 +69,9 @@ const ActionCell: React.FC<ActionCellProps> = ({
     <div className="flex justify-center items-center" ref={dropdownRef}>
       <div
         ref={refs.setReference}
-        className={`hover:bg-primary/10 w-10 h-10 flex items-center justify-center rounded-lg cursor-pointer ${open ? "bg-primary/20" : ""}`}
+        className={`hover:bg-primary/10 w-10 h-10 flex items-center justify-center rounded-md cursor-pointer ${open ? "bg-primary/20" : ""}`}
         onClick={() => {
           setOpen(!open);
-          toggleAction?.();
         }}
       >
         <TfiMore size={14} className="rotate-90 text-primary" />
@@ -84,12 +83,13 @@ const ActionCell: React.FC<ActionCellProps> = ({
           <div
             ref={refs.setFloating}
             style={{ ...floatingStyles, zIndex: 9999 }} // Ensure it's above everything
-            className="flex flex-col bg-white rounded shadow-xl border border-gray-100 min-w-32 text-xs"
+            className="flex min-w-34 flex-col overflow-hidden rounded-md border border-tableBorder bg-white text-xs shadow-xl shadow-primary/10"
           >
             {(canView || onView) && (
               <button
-                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2.5 text-tableHeading hover:bg-tetiary cursor-pointer"
                 onClick={() => {
+                  toggleAction?.();
                   onView?.(rowId);
                   setOpen(false);
                 }}
@@ -99,8 +99,9 @@ const ActionCell: React.FC<ActionCellProps> = ({
             )}
             {onEdit && (
               <button
-                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                className="flex items-center gap-2 px-3 py-2.5 text-tableHeading hover:bg-tetiary cursor-pointer"
                 onClick={() => {
+                  toggleAction?.();
                   onEdit(rowId);
                   setOpen(false);
                 }}
@@ -110,8 +111,9 @@ const ActionCell: React.FC<ActionCellProps> = ({
             )}
             {otherAction && (
               <button
-                className={`flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer ${otherAction.isDanger && "text-red-600"} border-t border-gray-50`}
+                className={`flex items-center gap-2 px-3 py-2.5 hover:bg-tetiary cursor-pointer ${otherAction.isDanger ? "text-red-600" : "text-tableHeading"} border-t border-tableBorder`}
                 onClick={() => {
+                  toggleAction?.();
                   otherAction.action();
                   setOpen(false);
                 }}
@@ -121,8 +123,9 @@ const ActionCell: React.FC<ActionCellProps> = ({
             )}
             {onDelete && (
               <button
-                className="flex items-center gap-2 px-3 py-2 hover:bg-gray-100 cursor-pointer text-red-600 border-t border-gray-50"
+                className="flex items-center gap-2 px-3 py-2.5 hover:bg-tetiary cursor-pointer text-red-600 border-t border-tableBorder"
                 onClick={() => {
+                  toggleAction?.();
                   onDelete(rowId);
                   setOpen(false);
                 }}

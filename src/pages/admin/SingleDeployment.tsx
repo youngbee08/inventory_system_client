@@ -57,32 +57,186 @@ const getMaterialMeta = (material: Deployment["materials"][number]) => {
   };
 };
 
+const SkeletonBlock = ({ className = "" }: { className?: string }) => (
+  <div className={`animate-pulse rounded-md bg-outlineBlack/70 ${className}`} />
+);
+
+const SingleDeploymentSkeleton = () => {
+  return (
+    <main className="flex flex-col gap-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="w-full max-w-2xl">
+          <SkeletonBlock className="h-4 w-36" />
+          <SkeletonBlock className="mt-4 h-8 w-4/5 max-w-120" />
+          <SkeletonBlock className="mt-3 h-4 w-full" />
+          <SkeletonBlock className="mt-2 h-4 w-3/5" />
+        </div>
+        <SkeletonBlock className="h-8 w-24" />
+      </div>
+
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {[0, 1, 2, 3].map((item) => (
+          <article
+            key={item}
+            className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5"
+          >
+            <SkeletonBlock className="size-10" />
+            <SkeletonBlock className="mt-4 h-3 w-24" />
+            <SkeletonBlock className="mt-3 h-5 w-32" />
+          </article>
+        ))}
+      </section>
+
+      <section className="grid gap-6 xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.2fr)]">
+        {[0, 1].map((item) => (
+          <article
+            key={item}
+            className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5"
+          >
+            <div className="flex items-center gap-3">
+              <SkeletonBlock className="size-10" />
+              <div className="flex-1">
+                <SkeletonBlock className="h-4 w-40" />
+                <SkeletonBlock className="mt-2 h-3 w-56 max-w-full" />
+              </div>
+            </div>
+            <div className="mt-5 space-y-4">
+              {[0, 1, 2, 3].map((row) => (
+                <div key={row} className="grid gap-2 sm:grid-cols-[140px_1fr]">
+                  <SkeletonBlock className="h-3 w-24" />
+                  <SkeletonBlock className="h-3 w-full" />
+                </div>
+              ))}
+            </div>
+          </article>
+        ))}
+      </section>
+
+      <section className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5">
+        <div className="flex items-center gap-3">
+          <SkeletonBlock className="size-10" />
+          <div>
+            <SkeletonBlock className="h-4 w-44" />
+            <SkeletonBlock className="mt-2 h-3 w-64 max-w-full" />
+          </div>
+        </div>
+        <div className="mt-5 space-y-3">
+          <SkeletonBlock className="h-10 w-full" />
+          {[0, 1, 2].map((row) => (
+            <SkeletonBlock key={row} className="h-12 w-full" />
+          ))}
+        </div>
+      </section>
+    </main>
+  );
+};
+
+const DeploymentState = ({
+  title,
+  message,
+  actionLabel,
+  onAction,
+}: {
+  title: string;
+  message: string;
+  actionLabel?: string;
+  onAction?: () => void;
+}) => (
+  <main className="flex min-h-[55vh] items-center justify-center">
+    <section className="w-full max-w-lg text-center">
+      <h1 className="mt-5 text-lg font-extrabold text-tableHeading">{title}</h1>
+      <p className="mt-2 text-sm leading-6 text-tableData">{message}</p>
+      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
+        <Link
+          to="/admin/deployments"
+          className="inline-flex h-10 items-center justify-center rounded-md border border-tableBorder bg-white px-4 text-xs font-bold text-tableHeading transition hover:bg-secondary"
+        >
+          Go Back
+        </Link>
+        {actionLabel && onAction && (
+          <button
+            type="button"
+            onClick={onAction}
+            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90"
+          >
+            {actionLabel}
+          </button>
+        )}
+      </div>
+    </section>
+  </main>
+);
+
 const SingleDeployment: React.FC = () => {
-  const {id} = useParams()
+  const { id } = useParams();
   const [deployment, setDeployment] = useState<Deployment | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
 
   const assignedTo =
     typeof deployment?.assignedTo === "string" ? null : deployment?.assignedTo;
   const assignedToLabel =
     typeof deployment?.assignedTo === "string"
       ? deployment?.assignedTo
-      : deployment?.assignedTo.name;
+      : deployment?.assignedTo?.name;
 
+  const reFetchDeployment = async () => {
+    if (!id) return;
+
+    setIsLoading(true);
+    setError(null);
+    try {
+      const res = await api.get(`/deployments/${id}`);
+      setDeployment(res.data.deployment ?? null);
+    } catch (err: unknown) {
+      const message = getErrorMessage(err, "Failed to load deployment");
+      setError(message);
+      toast.error(message);
+    } finally {
+      setIsLoading(false);
+    }
+  };
   useEffect(() => {
     const fetchDeployment = async () => {
+      if (!id) return;
+
       setIsLoading(true);
+      setError(null);
       try {
         const res = await api.get(`/deployments/${id}`);
         setDeployment(res.data.deployment ?? null);
       } catch (err: unknown) {
-        toast.error(getErrorMessage(err, "Failed to load deployments"));
+        const message = getErrorMessage(err, "Failed to load deployment");
+        setError(message);
+        toast.error(message);
       } finally {
         setIsLoading(false);
       }
     };
-    fetchDeployment()
+    fetchDeployment();
   }, [id]);
+
+  if (isLoading) return <SingleDeploymentSkeleton />;
+
+  if (error) {
+    return (
+      <DeploymentState
+        title="Unable to load deployment"
+        message={error}
+        actionLabel="Retry"
+        onAction={reFetchDeployment}
+      />
+    );
+  }
+
+  if (!deployment) {
+    return (
+      <DeploymentState
+        title="Deployment not found"
+        message="This deployment may have been removed, or the server returned an empty deployment response."
+      />
+    );
+  }
 
   return (
     <main className="flex flex-col gap-6">
@@ -175,7 +329,6 @@ const SingleDeployment: React.FC = () => {
 
           <dl className="mt-5 divide-y divide-tableBorder">
             {[
-              ["Deployment ID", deployment?._id],
               ["Title", deployment?.title],
               ["Destination", deployment?.destination],
               [
