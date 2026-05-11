@@ -61,9 +61,9 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
   const displayedActivities = isRecent ? activities.slice(0, 4) : activities;
 
   return (
-    <section className="flex flex-col gap-5">
+    <section className="flex min-w-0 flex-col gap-5">
       {!isRecent && (
-        <div className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5">
+        <div>
           <h1 className="text-xl font-extrabold text-tableHeading">
             Activity Log
           </h1>
@@ -74,7 +74,13 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
         </div>
       )}
 
-      <div className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5">
+      <div
+        className={
+          isRecent
+            ? ""
+            : "rounded-md border border-tableBorder bg-white p-4 shadow-sm shadow-primary/5 sm:p-5"
+        }
+      >
         <ActivityList activities={displayedActivities} />
       </div>
     </section>

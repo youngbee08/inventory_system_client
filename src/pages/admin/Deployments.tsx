@@ -134,9 +134,9 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
   const displayedDeployments = isRecent ? deployments.slice(0, 4) : deployments;
 
   return (
-    <section className="flex flex-col gap-5">
+    <section className="flex min-w-0 flex-col gap-5">
       {!isRecent && (
-        <div className="flex flex-col gap-4 rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h1 className="text-xl font-extrabold text-tableHeading">
               Deployments
@@ -149,7 +149,7 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
 
           <button
             type="button"
-            className="inline-flex h-10 items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90"
+            className="inline-flex h-10 w-full items-center justify-center gap-2 rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90 sm:w-auto"
           >
             <MdAdd size={17} />
             Add Deployment
@@ -157,7 +157,13 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
         </div>
       )}
 
-      <div className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5">
+      <div
+        className={
+          isRecent
+            ? ""
+            : "rounded-md border border-tableBorder bg-white p-4 shadow-sm shadow-primary/5 sm:p-5"
+        }
+      >
         <ReusableTable
           columns={columns}
           data={displayedDeployments}

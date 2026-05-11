@@ -1,8 +1,4 @@
-import {
-  MdInventory2,
-  MdLocalShipping,
-  MdWarningAmber,
-} from "react-icons/md";
+import { MdInventory2, MdLocalShipping, MdWarningAmber } from "react-icons/md";
 import { Link } from "react-router-dom";
 import StatCard from "../../components/cards/StatCard";
 import SectionHeader from "../../components/common/SectionHeader";
@@ -11,18 +7,33 @@ import Activities from "../general/Activities";
 import Deployments from "./Deployments";
 import {
   formatCompactAmount,
-  formatNumberWithCommas,
+  // formatNumberWithCommas,
 } from "../../utility/formatterUtilities";
 
-const overviewStats = {
-  totalMaterials: 12840,
-  lowStockMaterials: 46,
-  totalDeployments: 924,
-};
-
 const Overview = () => {
-  const { user } = useUser();
+  const { user,dashboardMetrics } = useUser();
   const firstName = user?.name?.split(" ")?.[0] ?? "Admin";
+
+  const metrics = [
+    {
+      title: "Total Materials",
+      value: dashboardMetrics.totalMaterials,
+      icon: MdInventory2,
+      subtitle: "Across active inventory categories",
+    },
+    {
+      title: "Low Stock Materials",
+      value: dashboardMetrics.lowStockMaterials,
+      icon: MdWarningAmber,
+      subtitle: "Items at or below reorder level",
+    },
+    {
+      title: "Total Deployments",
+      value: dashboardMetrics.totalDeployments,
+      icon: MdLocalShipping,
+      subtitle: "All deployment records",
+    },
+  ];
 
   return (
     <main className="flex flex-col gap-6">
@@ -41,28 +52,19 @@ const Overview = () => {
       </section>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-        <StatCard
-          title="Total Materials"
-          value={formatCompactAmount(overviewStats.totalMaterials)}
-          icon={MdInventory2}
-          subtitle="Across active inventory categories"
-        />
-        <StatCard
-          title="Low Stock Materials"
-          value={formatNumberWithCommas(overviewStats.lowStockMaterials)}
-          icon={MdWarningAmber}
-          subtitle="Items at or below reorder level"
-        />
-        <StatCard
-          title="Total Deployments"
-          value={formatCompactAmount(overviewStats.totalDeployments)}
-          icon={MdLocalShipping}
-          subtitle="All deployment records"
-        />
+        {metrics.map((metric, idx) => (
+          <StatCard
+            key={idx}
+            title={metric.title}
+            value={formatCompactAmount(metric.value)}
+            icon={metric.icon}
+            subtitle={metric.subtitle}
+          />
+        ))}
       </section>
 
-      <section className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
-        <section className="flex flex-col gap-4">
+      <section className="grid min-w-0 gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(320px,0.75fr)]">
+        <section className="min-w-0 rounded-md border border-tableBorder bg-white p-4 shadow-sm shadow-primary/5 sm:p-5">
           <SectionHeader
             title="Recent Deployments"
             subtitle="Latest material dispatches and employee assignments."
@@ -75,10 +77,12 @@ const Overview = () => {
               </Link>
             }
           />
-          <Deployments isRecent />
+          <div className="mt-5">
+            <Deployments isRecent />
+          </div>
         </section>
 
-        <section className="flex flex-col gap-4">
+        <section className="min-w-0 rounded-md border border-tableBorder bg-white p-4 shadow-sm shadow-primary/5 sm:p-5">
           <SectionHeader
             title="Recent Activities"
             subtitle="Operational updates from users and inventory actions."
@@ -91,7 +95,9 @@ const Overview = () => {
               </Link>
             }
           />
-          <Activities isRecent />
+          <div className="mt-5">
+            <Activities isRecent />
+          </div>
         </section>
       </section>
     </main>

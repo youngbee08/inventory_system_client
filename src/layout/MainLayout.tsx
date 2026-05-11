@@ -3,7 +3,6 @@ import type React from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import type { Variants } from "framer-motion";
 import { NavLink, useLocation } from "react-router-dom";
-import { MdInventory2 } from "react-icons/md";
 import Sidebar from "../components/navs/Sidebar";
 import TopNav from "../components/navs/TopNav";
 import { navItems } from "../lib/navitems";
@@ -23,7 +22,7 @@ const MainLayout = ({
   showTopNav = true,
 }: LayoutProps) => {
   useEffect(() => {
-    document.title = "SalesHub - " + pageName;
+    document.title = "ElectraFlow - " + pageName;
   }, [pageName]);
 
   const location = useLocation();
@@ -122,10 +121,10 @@ const MainLayout = ({
         <div className="flex min-w-0 flex-1 flex-col bg-primary/10">
           <div className="flex h-16 shrink-0 items-center gap-4 border-b border-tableBorder bg-white px-4 md:px-6">
             <div className="flex items-center gap-3 lg:hidden">
-              <span className="grid size-8 place-items-center rounded-md bg-primary text-white">
-                <MdInventory2 size={18} />
+              
+              <span className="text-sm font-bold text-primary">
+                ElectraFlow
               </span>
-              <span className="text-sm font-bold text-primary">SalesHub</span>
             </div>
 
             {showTopNav && <TopNav showSearchBar={showSearchBar} />}

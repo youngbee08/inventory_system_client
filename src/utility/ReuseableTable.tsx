@@ -92,15 +92,15 @@ const ReusableTable = <T extends { id?: number | string }>({
   ];
 
   return (
-    <div className="space-y-5">
-      <div className="w-full overflow-x-auto styled-scrollbar">
-        <table className="w-full min-w-190 bg-white">
+    <div className="min-w-0 max-w-full space-y-5">
+      <div className="w-full max-w-full overflow-x-auto styled-scrollbar">
+        <table className="w-full min-w-[720px] bg-white">
           <thead>
             <tr className="border-y border-tableBorder bg-secondary">
               {columnsWithSN.map((col, idx) => (
                 <th
                   key={col.key ?? idx}
-                  className={`px-4 py-3 text-left text-[11px] font-bold uppercase text-tableHeading whitespace-nowrap ${col.tableHeadingClassName ?? ""}`}
+                  className={`px-3 py-3 text-left text-[10px] font-bold uppercase text-tableHeading whitespace-nowrap sm:px-4 sm:text-[11px] ${col.tableHeadingClassName ?? ""}`}
                 >
                   {col.label}
                 </th>
@@ -113,7 +113,7 @@ const ReusableTable = <T extends { id?: number | string }>({
               Array.from({ length: 4 }, (_, row) => (
                 <tr key={row} className="border-b border-tableBorder">
                   {columnsWithSN.map((col, index) => (
-                    <td key={col.key ?? index} className="px-4 py-4">
+                    <td key={col.key ?? index} className="px-3 py-4 sm:px-4">
                       <div className="h-3 w-full max-w-34 animate-pulse rounded bg-outlineBlack/70" />
                     </td>
                   ))}
@@ -123,7 +123,7 @@ const ReusableTable = <T extends { id?: number | string }>({
               <tr className="border-b border-tableBorder">
                 <td
                   colSpan={columnsWithSN.length}
-                  className="px-4 py-5 text-center text-xs font-medium text-red-600"
+                  className="px-3 py-5 text-center text-xs font-medium text-red-600 sm:px-4"
                 >
                   {typeof error === "string"
                     ? error
@@ -149,7 +149,7 @@ const ReusableTable = <T extends { id?: number | string }>({
                       key={col.key ?? idx}
                       className={
                         col.className ||
-                        "px-4 py-4 text-xs font-medium text-tableData whitespace-nowrap"
+                        "px-3 py-4 text-xs font-medium text-tableData whitespace-nowrap sm:px-4"
                       }
                     >
                       {col.render

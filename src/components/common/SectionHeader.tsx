@@ -8,7 +8,7 @@ interface SectionHeaderProps {
 
 const SectionHeader = ({ title, subtitle, action }: SectionHeaderProps) => {
   return (
-    <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+    <div className="flex gap-3 items-start justify-between">
       <div>
         <h2 className="text-sm font-bold text-tableHeading">{title}</h2>
         {subtitle && (

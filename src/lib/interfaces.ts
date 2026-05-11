@@ -19,7 +19,7 @@ export interface UserContextType {
   logout: () => void;
   isAuthenticated: boolean;
   refreshUser: (token: string) => Promise<void>;
-  dashboardMetrics: DashboardMetrics | AdminDashboardMetrics;
+  dashboardMetrics: DashboardMetrics;
   loading: boolean;
 }
 
@@ -28,15 +28,11 @@ export interface DashboardMetrics {
   employeeCompletedDeployments: number;
   employeePendingMaterials: number;
   employeeInTransitMaterials: number;
-  recentActivities: Activity[];
-}
-export interface AdminDashboardMetrics {
   totalMaterials: number;
   lowStockMaterials: number;
   totalDeployments: number;
   recentActivities: Activity[];
 }
-
 export interface Activity {
   _id: string;
   action: string;

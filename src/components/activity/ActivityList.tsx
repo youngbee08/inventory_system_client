@@ -1,7 +1,6 @@
 import { PiPulse } from "react-icons/pi";
 import type { Activity } from "../../lib/interfaces";
 import {
-  formatUnderScores,
   getInitials,
 } from "../../utility/formatterUtilities";
 import EmptyState from "../common/EmptyState";
@@ -21,11 +20,11 @@ const getPerformerInitials = (name: string) => {
 const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
   if (isLoading) {
     return (
-      <div className="space-y-4">
+      <div className="min-w-0 max-w-full space-y-4">
         {skeletonItems.map((item) => (
           <div key={item} className="flex gap-3">
             <div className="size-9 animate-pulse rounded-full bg-outlineBlack/70" />
-            <div className="flex-1 space-y-2">
+            <div className="min-w-0 flex-1 space-y-2">
               <div className="h-3 w-11/12 animate-pulse rounded bg-outlineBlack/70" />
               <div className="h-3 w-1/3 animate-pulse rounded bg-outlineBlack/70" />
             </div>
@@ -46,11 +45,11 @@ const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="min-w-0 max-w-full space-y-4">
       {activities.map((activity) => (
         <article
           key={activity._id}
-          className="flex gap-3 border-b border-tableBorder pb-4 last:border-b-0 last:pb-0"
+          className="flex min-w-0 gap-3 border-b border-tableBorder pb-4 last:border-b-0 last:pb-0"
         >
           <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-[11px] font-extrabold text-primary">
             {getPerformerInitials(activity.performedBy.name)}
@@ -58,14 +57,11 @@ const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
 
           <div className="min-w-0 flex-1">
             <div className="flex flex-wrap items-center gap-2">
-              <p className="text-xs font-semibold leading-5 text-tableHeading">
+              <p className="min-w-0 text-xs font-semibold leading-5 text-tableHeading [overflow-wrap:anywhere]">
                 {activity.message}
               </p>
-              <span className="rounded-full bg-secondary px-2 py-0.5 text-[10px] font-bold text-tableData ring-1 ring-tableBorder">
-                {formatUnderScores(activity.action, true)}
-              </span>
             </div>
-            <p className="mt-1 text-[11px] font-medium text-tableData">
+            <p className="mt-1 text-[11px] font-medium text-tableData [overflow-wrap:anywhere]">
               {activity.material} - {activity.createdAt}
             </p>
           </div>
