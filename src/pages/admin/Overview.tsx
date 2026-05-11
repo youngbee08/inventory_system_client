@@ -3,12 +3,12 @@ import {
   MdLocalShipping,
   MdWarningAmber,
 } from "react-icons/md";
-import RecentActivityList from "../../components/activity/RecentActivityList";
+import { Link } from "react-router-dom";
 import StatCard from "../../components/cards/StatCard";
-import RecentDeploymentTable from "../../components/tables/RecentDeploymentTable";
-import type { RecentDeployment } from "../../components/tables/RecentDeploymentTable";
+import SectionHeader from "../../components/common/SectionHeader";
 import { useUser } from "../../contexts/user/UserContext";
-import type { Activity } from "../../lib/interfaces";
+import Activities from "../general/Activities";
+import Deployments from "./Deployments";
 import {
   formatCompactAmount,
   formatNumberWithCommas,
@@ -19,76 +19,6 @@ const overviewStats = {
   lowStockMaterials: 46,
   totalDeployments: 924,
 };
-
-const recentDeployments: RecentDeployment[] = [
-  {
-    id: "dep-001",
-    title: "Feeder Panel Replacement",
-    assignedEmployee: "Amina Yusuf",
-    destination: "Ikeja Business Unit",
-    status: "in_transit",
-    createdAt: "2026-05-10T09:22:00.000Z",
-  },
-  {
-    id: "dep-002",
-    title: "Transformer Accessories Dispatch",
-    assignedEmployee: "Daniel Okafor",
-    destination: "Lekki Phase 1",
-    status: "completed",
-    createdAt: "2026-05-09T14:40:00.000Z",
-  },
-  {
-    id: "dep-003",
-    title: "Meter Installation Batch",
-    assignedEmployee: "Grace Bello",
-    destination: "Yaba Service Center",
-    status: "pending",
-    createdAt: "2026-05-09T08:15:00.000Z",
-  },
-  {
-    id: "dep-004",
-    title: "Emergency Cable Supply",
-    assignedEmployee: "Tunde Salami",
-    destination: "Ajah Field Office",
-    status: "cancelled",
-    createdAt: "2026-05-08T16:05:00.000Z",
-  },
-];
-
-const recentActivities: Activity[] = [
-  {
-    _id: "act-001",
-    action: "material_updated",
-    message: "Amina Yusuf updated the stock count for armoured cable.",
-    performedBy: { _id: 1, name: "Amina Yusuf" },
-    material: "Armoured Cable 16mm",
-    createdAt: "12 min ago",
-  },
-  {
-    _id: "act-002",
-    action: "deployment_completed",
-    message: "Daniel Okafor completed a transformer accessories deployment.",
-    performedBy: { _id: 2, name: "Daniel Okafor" },
-    material: "Transformer Accessories",
-    createdAt: "43 min ago",
-  },
-  {
-    _id: "act-003",
-    action: "low_stock_alert",
-    message: "System flagged porcelain fuse inventory below threshold.",
-    performedBy: { _id: 3, name: "System Monitor" },
-    material: "Porcelain Fuse 100A",
-    createdAt: "1 hr ago",
-  },
-  {
-    _id: "act-004",
-    action: "deployment_created",
-    message: "Grace Bello created a new meter installation batch.",
-    performedBy: { _id: 4, name: "Grace Bello" },
-    material: "Single Phase Meter",
-    createdAt: "2 hrs ago",
-  },
-];
 
 const Overview = () => {
   const { user } = useUser();
@@ -132,8 +62,37 @@ const Overview = () => {
       </section>
 
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1.25fr)_minmax(360px,0.75fr)]">
-        <RecentDeploymentTable deployments={recentDeployments} />
-        <RecentActivityList activities={recentActivities} />
+        <section className="flex flex-col gap-4">
+          <SectionHeader
+            title="Recent Deployments"
+            subtitle="Latest material dispatches and employee assignments."
+            action={
+              <Link
+                to="/admin/deployments"
+                className="text-xs font-bold text-primary transition hover:text-primary/80"
+              >
+                View All
+              </Link>
+            }
+          />
+          <Deployments isRecent />
+        </section>
+
+        <section className="flex flex-col gap-4">
+          <SectionHeader
+            title="Recent Activities"
+            subtitle="Operational updates from users and inventory actions."
+            action={
+              <Link
+                to="/general/activities"
+                className="text-xs font-bold text-primary transition hover:text-primary/80"
+              >
+                View All
+              </Link>
+            }
+          />
+          <Activities isRecent />
+        </section>
       </section>
     </main>
   );

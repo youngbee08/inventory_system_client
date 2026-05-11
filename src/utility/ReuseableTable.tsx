@@ -1,7 +1,7 @@
 import React from "react";
 // import PaginationControls from "./PaginationControls";
 import type { ReusableTableProps, TableColumnProps } from "../lib/interfaces";
-import { LuLoaderCircle } from "react-icons/lu";
+import EmptyState from "../components/common/EmptyState";
 
 const ReusableTable = <T extends { id?: number | string }>({
   columns,
@@ -92,15 +92,15 @@ const ReusableTable = <T extends { id?: number | string }>({
   ];
 
   return (
-    <div className="space-y-5 pb-10">
-      <div className="overflow-x-auto no-scrollbar w-full lg:p-0 pe-4">
-        <table className="w-full min-w-250 bg-white mb-2">
+    <div className="space-y-5">
+      <div className="w-full overflow-x-auto styled-scrollbar">
+        <table className="w-full min-w-190 bg-white">
           <thead>
-            <tr className="bg-[#E0E5DC69] h-11 rounded-xl">
+            <tr className="border-y border-tableBorder bg-secondary">
               {columnsWithSN.map((col, idx) => (
                 <th
                   key={col.key ?? idx}
-                  className={`px-3 py-1 text-[10px] font-medium text-tableHeading text-start border-x border-tableBorder first:border-s-0 last:border-e-0 whitespace-nowrap ${col.tableHeadingClassName}`}
+                  className={`px-4 py-3 text-left text-[11px] font-bold uppercase text-tableHeading whitespace-nowrap ${col.tableHeadingClassName ?? ""}`}
                 >
                   {col.label}
                 </th>
@@ -110,19 +110,20 @@ const ReusableTable = <T extends { id?: number | string }>({
 
           <tbody>
             {isLoading ? (
-              <tr className="h-12 border-y border-tableBorder">
-                <td colSpan={columnsWithSN.length}>
-                  <div className="flex items-center justify-center gap-2 text-xs">
-                    <LuLoaderCircle className="animate-spin" />
-                    <span>Loading...</span>
-                  </div>
-                </td>
-              </tr>
+              Array.from({ length: 4 }, (_, row) => (
+                <tr key={row} className="border-b border-tableBorder">
+                  {columnsWithSN.map((col, index) => (
+                    <td key={col.key ?? index} className="px-4 py-4">
+                      <div className="h-3 w-full max-w-34 animate-pulse rounded bg-outlineBlack/70" />
+                    </td>
+                  ))}
+                </tr>
+              ))
             ) : error ? (
-              <tr className="h-12 border-y border-tableBorder">
+              <tr className="border-b border-tableBorder">
                 <td
                   colSpan={columnsWithSN.length}
-                  className="px-3 py-1 text-[10px] text-center"
+                  className="px-4 py-5 text-center text-xs font-medium text-red-600"
                 >
                   {typeof error === "string"
                     ? error
@@ -132,26 +133,23 @@ const ReusableTable = <T extends { id?: number | string }>({
                 </td>
               </tr>
             ) : data.length === 0 ? (
-              <tr className="h-11 border-y border-tableBorder">
-                <td
-                  colSpan={columnsWithSN.length}
-                  className="px-3 py-1 text-[10px] text-center"
-                >
-                  No data found.
+              <tr>
+                <td colSpan={columnsWithSN.length} className="py-5">
+                  <EmptyState />
                 </td>
               </tr>
             ) : (
               data.map((item, index) => (
                 <tr
                   key={(getRowId ? getRowId(item, index) : item.id) || index}
-                  className={`h-11 border-y border-tableBorder`}
+                  className="border-b border-tableBorder last:border-b-0"
                 >
                   {columnsWithSN.map((col, idx) => (
                     <td
                       key={col.key ?? idx}
                       className={
                         col.className ||
-                        "px-3 py-1 text-[10px] whitespace-nowrap text-tableData font-medium border-x border-tableBorder first:border-s-0 last:border-e-0"
+                        "px-4 py-4 text-xs font-medium text-tableData whitespace-nowrap"
                       }
                     >
                       {col.render
