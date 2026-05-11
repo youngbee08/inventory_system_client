@@ -9,11 +9,12 @@ import Login from "./pages/general/auth/Login";
 import DashboardOverview from "./pages/user/Overview";
 import ProtectRoute from "./helpers/ProtectRoute";
 import NotFound from "./pages/general/NotFound";
+import Activities from "./pages/general/Activities";
 
 const App = () => {
   return (
     <>
-      <Toaster closeButton/>
+      <Toaster closeButton />
       <Routes>
         <Route path="/" element={<Login />} />
 
@@ -59,7 +60,19 @@ const App = () => {
           />
         </Route>
 
-        <Route path="*" element={<NotFound/>}/>
+        <Route element={<ProtectRoute allowedRoles={["employee", "admin"]} />}>
+          <Route
+            path="/general/activities"
+            element={
+              <MainLayout
+                children={<Activities />}
+                pageName="Activity Log"
+              />
+            }
+          />
+        </Route>
+
+        <Route path="*" element={<NotFound />} />
       </Routes>
     </>
   );

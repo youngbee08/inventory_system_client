@@ -1,9 +1,49 @@
 import React from "react";
 
+export interface SafeUserProps {
+  _id: number;
+  name: string;
+}
+export interface UserProps extends SafeUserProps {
+  email: string;
+  role: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface UserContextType {
+  user: UserProps | null;
+  token: string | null;
+  role: string | null;
+  login: (token: string) => void;
+  logout: () => void;
+  isAuthenticated: boolean;
+  refreshUser: (token: string) => Promise<void>;
+  dashboardMetrics: DashboardMetrics | AdminDashboardMetrics;
+  loading: boolean;
+}
+
 export interface DashboardMetrics {
+  employeeAssignedDeployments: number;
+  employeeCompletedDeployments: number;
+  employeePendingMaterials: number;
+  employeeInTransitMaterials: number;
+  recentActivities: Activity[];
+}
+export interface AdminDashboardMetrics {
   totalMaterials: number;
   lowStockMaterials: number;
-  totalInventoryQuantity: number;
+  totalDeployments: number;
+  recentActivities: Activity[];
+}
+
+export interface Activity {
+  _id: string;
+  action: string;
+  message: string;
+  performedBy: SafeUserProps;
+  material: string;
+  createdAt: string;
 }
 
 export interface TableColumnProps<T = unknown> {
@@ -42,25 +82,4 @@ export interface PaginationControlProps {
   setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
   setItemsPerPage: React.Dispatch<React.SetStateAction<number>>;
   tableType?: string;
-}
-
-export interface UserProps {
-  _id: number;
-  name: string;
-  email: string;
-  role: string;
-  created_at: string;
-  updated_at: string;
-}
-
-export interface UserContextType {
-  user: UserProps | null;
-  token: string | null;
-  role: string | null;
-  login: (token: string) => void;
-  logout: () => void;
-  isAuthenticated: boolean;
-  refreshUser: (token: string) => Promise<void>;
-  dashboardMetrics: DashboardMetrics;
-  loading: boolean;
 }

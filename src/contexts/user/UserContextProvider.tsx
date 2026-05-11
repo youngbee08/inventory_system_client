@@ -2,17 +2,30 @@ import React, { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import api, { setupInterceptors } from "../../helpers/api";
 import axios from "axios";
-import type { DashboardMetrics, UserProps } from "../../lib/interfaces";
+import type {
+  AdminDashboardMetrics,
+  DashboardMetrics,
+  UserProps,
+} from "../../lib/interfaces";
 import { UserContext } from "./UserContext";
 
 interface userProviderProps {
   children: React.ReactNode;
 }
 
-const EMPTY_METRICS: DashboardMetrics = {
+const USER_EMPTY_METRICS: DashboardMetrics = {
+  employeeAssignedDeployments: 0,
+  employeeCompletedDeployments: 0,
+  employeePendingMaterials: 0,
+  employeeInTransitMaterials: 0,
+  recentActivities: [],
+};
+
+const ADMIN_EMPTY_METRICS: AdminDashboardMetrics = {
   totalMaterials: 0,
   lowStockMaterials: 0,
-  totalInventoryQuantity: 0,
+  totalDeployments: 0,
+  recentActivities: [],
 };
 
 export const UserProvider = ({ children }: userProviderProps) => {
@@ -22,8 +35,9 @@ export const UserProvider = ({ children }: userProviderProps) => {
   const [loading, setLoading] = useState<boolean>(true);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  const [dashboardMetrics, setDashboardMetrics] =
-    useState<DashboardMetrics>(EMPTY_METRICS);
+  const [dashboardMetrics, setDashboardMetrics] = useState<
+    DashboardMetrics | AdminDashboardMetrics
+  >(USER_EMPTY_METRICS || ADMIN_EMPTY_METRICS);
 
   const logout = useCallback(() => {
     localStorage.removeItem("token");
@@ -34,7 +48,7 @@ export const UserProvider = ({ children }: userProviderProps) => {
     setUser(null);
     setRole(null);
     setIsAuthenticated(false);
-    setDashboardMetrics(EMPTY_METRICS);
+    setDashboardMetrics(USER_EMPTY_METRICS || ADMIN_EMPTY_METRICS);
     toast.success("Logged out successfully");
     window.location.href = "/";
   }, []);
@@ -103,13 +117,12 @@ export const UserProvider = ({ children }: userProviderProps) => {
     localStorage.setItem("token", token);
     setToken(token);
     setIsAuthenticated(true);
-    refreshUser(token)
+    refreshUser(token);
   };
 
   useEffect(() => {
     setupInterceptors(logout);
   }, [logout]);
-
 
   return (
     <UserContext.Provider

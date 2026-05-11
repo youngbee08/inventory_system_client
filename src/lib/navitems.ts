@@ -1,9 +1,5 @@
-import {
-  PiChartBar,
-  PiPackage,
-  PiSquaresFour,
-  PiTruck,
-} from "react-icons/pi";
+import { MdContentPaste } from "react-icons/md";
+import { PiChartBar, PiPackage, PiSquaresFour, PiTruck } from "react-icons/pi";
 
 export const navItems = [
   {
@@ -26,9 +22,15 @@ export const navItems = [
   },
   {
     name: "Reports",
-    icon: PiChartBar,
+    icon: MdContentPaste,
     path: "/admin/reports",
     role: ["admin"],
+  },
+  {
+    name: "Activity Log",
+    icon: PiChartBar,
+    path: "/general/activities",
+    role: ["admin", "employee"],
   },
   {
     name: "Dashboard",
