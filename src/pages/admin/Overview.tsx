@@ -15,7 +15,7 @@ const Overview = () => {
   const firstName = user?.name?.split(" ")?.[0] ?? "Admin";
 
   const metrics = [
-    {
+    { 
       title: "Total Materials",
       value: dashboardMetrics.totalMaterials,
       icon: MdInventory2,

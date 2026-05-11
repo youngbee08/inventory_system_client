@@ -1,7 +1,7 @@
 import React from "react";
 
 export interface SafeUserProps {
-  _id: number;
+  _id: number | string;
   name: string;
 }
 export interface UserProps extends SafeUserProps {
@@ -42,6 +42,37 @@ export interface Activity {
   createdAt: string;
 }
 
+export type DeploymentStatus =
+  | "pending"
+  | "in_transit"
+  | "completed"
+  | "cancelled";
+
+export type DeploymentMaterialStatus =
+  | "allocated"
+  | "pending"
+  | "deployed"
+  | "returned"
+  | "cancelled";
+
+export interface DeploymentMaterial {
+  material: string;
+  quantity: number;
+  status: DeploymentMaterialStatus | string;
+}
+
+export interface Deployment {
+  _id: string;
+  title: string;
+  destination: string;
+  assignedTo: string | SafeUserProps;
+  status: DeploymentStatus;
+  materials: DeploymentMaterial[];
+  createdAt: string;
+  updatedAt: string;
+  __v?: number;
+}
+
 export interface TableColumnProps<T = unknown> {
   label: string | React.ReactNode;
   key?: string;
@@ -50,9 +81,8 @@ export interface TableColumnProps<T = unknown> {
   tableHeadingClassName?: string;
 }
 
-export interface ReusableTableProps<
-  T extends { id?: number | string },
-> extends PaginationControlProps {
+export interface ReusableTableProps<T extends object>
+  extends PaginationControlProps {
   columns: TableColumnProps<T>[];
   isLoading: boolean;
   data: T[];

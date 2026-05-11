@@ -3,7 +3,18 @@ import React from "react";
 import type { ReusableTableProps, TableColumnProps } from "../lib/interfaces";
 import EmptyState from "../components/common/EmptyState";
 
-const ReusableTable = <T extends { id?: number | string }>({
+const getDefaultRowId = <T extends object>(
+  item: T,
+): number | string | undefined => {
+  const row = item as Record<string, unknown>;
+  const rowId = row.id ?? row._id;
+
+  return typeof rowId === "string" || typeof rowId === "number"
+    ? rowId
+    : undefined;
+};
+
+const ReusableTable = <T extends object>({
   columns,
   data,
   isLoading,
@@ -24,7 +35,9 @@ const ReusableTable = <T extends { id?: number | string }>({
 }: ReusableTableProps<T>) => {
   const selectedRowSet = new Set(selectedRowIds);
   const selectableRowIds = data
-    .map((item, index) => (getRowId ? getRowId(item, index) : item.id))
+    .map((item, index) =>
+      getRowId ? getRowId(item, index) : getDefaultRowId(item),
+    )
     .filter((id): id is number | string => id !== undefined && id !== null);
   const allRowsSelected =
     selectableRowIds.length > 0 &&
@@ -52,7 +65,9 @@ const ReusableTable = <T extends { id?: number | string }>({
             ),
             key: "bulk-select",
             render: (item: T, index: number) => {
-              const rowId = getRowId ? getRowId(item, index) : item.id;
+              const rowId = getRowId
+                ? getRowId(item, index)
+                : getDefaultRowId(item);
 
               if (rowId === undefined || rowId === null) return null;
 
@@ -141,7 +156,11 @@ const ReusableTable = <T extends { id?: number | string }>({
             ) : (
               data.map((item, index) => (
                 <tr
-                  key={(getRowId ? getRowId(item, index) : item.id) || index}
+                  key={
+                    (getRowId
+                      ? getRowId(item, index)
+                      : getDefaultRowId(item)) || index
+                  }
                   className="border-b border-tableBorder last:border-b-0"
                 >
                   {columnsWithSN.map((col, idx) => (

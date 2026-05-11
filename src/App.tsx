@@ -10,6 +10,7 @@ import DashboardOverview from "./pages/user/Overview";
 import ProtectRoute from "./helpers/ProtectRoute";
 import NotFound from "./pages/general/NotFound";
 import Activities from "./pages/general/Activities";
+import SingleDeployment from "./pages/admin/SingleDeployment";
 
 const App = () => {
   return (
@@ -41,6 +42,16 @@ const App = () => {
           />
 
           <Route
+            path="/admin/deployments/:id"
+            element={
+              <MainLayout
+                children={<SingleDeployment />}
+                pageName="Deployment details"
+              />
+            }
+          />
+
+          <Route
             path="/admin/reports"
             element={
               <MainLayout children={<Reports />} pageName="Inventory Reports" />
@@ -64,10 +75,7 @@ const App = () => {
           <Route
             path="/general/activities"
             element={
-              <MainLayout
-                children={<Activities />}
-                pageName="Activity Log"
-              />
+              <MainLayout children={<Activities />} pageName="Activity Log" />
             }
           />
         </Route>

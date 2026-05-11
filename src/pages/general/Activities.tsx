@@ -58,7 +58,7 @@ const activities: Activity[] = [
 ];
 
 const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
-  const displayedActivities = isRecent ? activities.slice(0, 4) : activities;
+  const displayedActivities = isRecent ? activities.slice(0, 3) : activities;
 
   return (
     <section className="flex min-w-0 flex-col gap-5">
