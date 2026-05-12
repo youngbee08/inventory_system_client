@@ -37,7 +37,7 @@ const Overview = () => {
   ];
 
   return (
-    <main className="flex flex-col gap-6">
+    <main className="flex flex-col gap-6 lg:pb-0 pb-20">
       <section className="rounded-md border border-tableBorder bg-white p-5 shadow-sm shadow-primary/5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>

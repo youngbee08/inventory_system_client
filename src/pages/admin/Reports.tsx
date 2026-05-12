@@ -207,7 +207,7 @@ const Reports: React.FC = () => {
   ];
 
   return (
-    <main className="flex min-w-0 flex-col gap-6">
+    <main className="flex min-w-0 flex-col gap-6 lg:pb-0 pb-20">
       <div>
         <h1 className="text-xl font-extrabold text-tableHeading">
           Inventory Reports

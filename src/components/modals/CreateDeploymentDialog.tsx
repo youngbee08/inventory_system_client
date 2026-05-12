@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react";
 import { toast } from "sonner";
-import { FiPlus,  } from "react-icons/fi";
+import { FiPlus } from "react-icons/fi";
 import Modal from "./Modal";
 import SearchableSelect, {
   type SearchableSelectOption,
@@ -9,6 +9,7 @@ import api, { getErrorMessage } from "../../helpers/api";
 import type { Material } from "../../lib/interfaces";
 import { formatNumberWithCommas } from "../../utility/formatterUtilities";
 import { FaMinus } from "react-icons/fa6";
+import { v4 as uuidv4 } from "uuid";
 
 interface CreateDeploymentDialogProps {
   isOpen: boolean;
@@ -27,7 +28,7 @@ interface DeploymentMaterialFormEntry {
 }
 
 const createMaterialEntry = (): DeploymentMaterialFormEntry => ({
-  rowId: crypto.randomUUID(),
+  rowId: uuidv4(),
   material: "",
   quantity: "",
 });

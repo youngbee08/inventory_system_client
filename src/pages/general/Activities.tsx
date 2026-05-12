@@ -37,7 +37,7 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Failed to load activities"));
     } finally {
-      setIsLoading(false);
+      setIsLoading(false);  
     }
   }, [currentPage, itemsPerPage]);
 
@@ -50,7 +50,7 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
   }, [fetchActivities]);
 
   return (
-    <section className="flex min-w-0 flex-col gap-5">
+    <section className="flex min-w-0 flex-col gap-5 lg:pb-0 pb-20">
       {!isRecent && (
         <div>
           <h1 className="text-xl font-extrabold text-tableHeading">

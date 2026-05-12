@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/refs */
 import React, { useState, useEffect, useRef } from "react";
 import { FaEye } from "react-icons/fa6";
 import { FiEdit, FiTrash2 } from "react-icons/fi";
@@ -47,6 +48,8 @@ const ActionCell: React.FC<ActionCellProps> = ({
     middleware: [offset(10), flip(), shift()],
     whileElementsMounted: autoUpdate,
   });
+  const setReference = refs.setReference;
+  const setFloating = refs.setFloating;
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -68,7 +71,7 @@ const ActionCell: React.FC<ActionCellProps> = ({
   return (
     <div className="flex justify-center items-center" ref={dropdownRef}>
       <div
-        ref={refs.setReference}
+        ref={setReference}
         className={`hover:bg-primary/10 w-10 h-10 flex items-center justify-center rounded-md cursor-pointer ${open ? "bg-primary/20" : ""}`}
         onClick={() => {
           setOpen(!open);
@@ -81,7 +84,7 @@ const ActionCell: React.FC<ActionCellProps> = ({
       {open && (
         <FloatingPortal>
           <div
-            ref={refs.setFloating}
+            ref={setFloating}
             style={{ ...floatingStyles, zIndex: 9999 }} // Ensure it's above everything
             className="flex min-w-34 flex-col overflow-hidden rounded-md border border-tableBorder bg-white text-xs shadow-xl shadow-primary/10"
           >

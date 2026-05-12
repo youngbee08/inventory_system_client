@@ -27,15 +27,15 @@ export const navItems = [
     role: ["admin"],
   },
   {
-    name: "Activity Log",
-    icon: PiChartBar,
-    path: "/general/activities",
-    role: ["admin", "employee"],
-  },
-  {
     name: "Dashboard",
     icon: PiSquaresFour,
     path: "/dashboard/overview",
     role: ["employee"],
+  },
+  {
+    name: "Activity Log",
+    icon: PiChartBar,
+    path: "/general/activities",
+    role: ["admin", "employee"],
   },
 ];

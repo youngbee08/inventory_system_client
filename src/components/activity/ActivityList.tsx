@@ -1,4 +1,3 @@
-import { PiPulse } from "react-icons/pi";
 import type { Activity } from "../../lib/interfaces";
 import {
   formatISODateToCustom,
@@ -35,7 +34,6 @@ const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
       <EmptyState
         title="No recent activity"
         message="Inventory and deployment events will appear in this feed."
-        icon={PiPulse}
       />
     );
   }
@@ -56,7 +54,7 @@ const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
                 Performed by : {activity.performedBy?.name}
               </p>
             </div>
-            <p className="mt-1 text-[11px] font-medium text-tableData [overflow-wrap:anywhere]">
+            <p className="mt-1 text-end text-[11px] font-medium text-tableData [overflow-wrap:anywhere]">
               {formatISODateToCustom(activity.createdAt)}
             </p>
           </div>

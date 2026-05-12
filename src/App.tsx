@@ -11,6 +11,8 @@ import ProtectRoute from "./helpers/ProtectRoute";
 import NotFound from "./pages/general/NotFound";
 import Activities from "./pages/general/Activities";
 import SingleDeployment from "./pages/admin/SingleDeployment";
+import Settings from "./pages/general/Settings";
+import Notifications from "./pages/general/Notifications";
 
 const App = () => {
   return (
@@ -42,16 +44,6 @@ const App = () => {
           />
 
           <Route
-            path="/admin/deployments/:id"
-            element={
-              <MainLayout
-                children={<SingleDeployment />}
-                pageName="Deployment details"
-              />
-            }
-          />
-
-          <Route
             path="/admin/reports"
             element={
               <MainLayout children={<Reports />} pageName="Inventory Reports" />
@@ -73,9 +65,34 @@ const App = () => {
 
         <Route element={<ProtectRoute allowedRoles={["employee", "admin"]} />}>
           <Route
+            path="/general/deployments/:id"
+            element={
+              <MainLayout
+                children={<SingleDeployment />}
+                pageName="Deployment details"
+              />
+            }
+          />
+
+          <Route
             path="/general/activities"
             element={
               <MainLayout children={<Activities />} pageName="Activity Log" />
+            }
+          />
+
+          <Route
+            path="/dashboard/settings"
+            element={<MainLayout children={<Settings />} pageName="Settings" />}
+          />
+
+          <Route
+            path="/dashboard/notifications"
+            element={
+              <MainLayout
+                children={<Notifications />}
+                pageName="Notifications"
+              />
             }
           />
         </Route>

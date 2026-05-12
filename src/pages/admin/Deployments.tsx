@@ -25,10 +25,10 @@ interface DeploymentsProps {
 }
 
 const statusClasses: Record<DeploymentStatus, string> = {
-  pending: "bg-amber-50 text-amber-700 ring-amber-200",
-  in_transit: "bg-blue-50 text-blue-700 ring-blue-200",
-  completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  cancelled: "bg-red-50 text-red-700 ring-red-200",
+  pending: "bg-amber-50/20 text-amber-700 ring-amber-200",
+  in_transit: "bg-blue-50/20 text-blue-700 ring-blue-200",
+  completed: "bg-emerald-50/20 text-emerald-700 ring-emerald-200",
+  cancelled: "bg-red-50/20 text-red-700 ring-red-200",
 };
 
 const getAssignedToLabel = (assignedTo: Deployment["assignedTo"]) => {
@@ -119,7 +119,9 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
                       setShowEditModal(true);
                     }
                   }}
-                  onView={() => navigate(`${deployment._id}`)}
+                  onView={() =>
+                    navigate(`/general/deployments/${deployment._id}`)
+                  }
                   otherAction={
                     deployment.status === "cancelled" ||
                     deployment.status === "completed"
@@ -171,7 +173,7 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
 
   return (
     <>
-      <section className="flex min-w-0 flex-col gap-5">
+      <section className="flex min-w-0 flex-col gap-5 lg:pb-0 pb-20">
         {!isRecent && (
           <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
             <div>

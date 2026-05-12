@@ -47,7 +47,7 @@ const TopNav: React.FC<TopNavProps> = ({ showSearchBar = true }) => {
 
       <div className="ml-auto flex gap-4 items-center">
         <Link
-          to=""
+          to="/dashboard/notifications"
           className="relative grid size-10 place-items-center rounded-full text-fadedBlack transition hover:bg-tetiary hover:text-primary"
         >
           <PiBellSimple size={20} className="transition" />
