@@ -114,6 +114,8 @@ const Deployments: React.FC<DeploymentsProps> = ({ isRecent = false }) => {
                   onEdit={() => {
                     if (deployment.status === "completed") {
                       toast.info("Can't update completed deployment");
+                    } else if (deployment.status === "cancelled") {
+                      toast.info("Can't updated cancelled deployment");
                     } else {
                       setSelectedDeployment(deployment);
                       setShowEditModal(true);

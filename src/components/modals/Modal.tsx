@@ -29,7 +29,12 @@ const Modal = ({
       onMouseDown={onClose}
     >
       {customMode ? (
-        <div onMouseDown={(event) => event.stopPropagation()}>{children}</div>
+        <div
+          className="w-full max-w-md"
+          onMouseDown={(event) => event.stopPropagation()}
+        >
+          {children}
+        </div>
       ) : (
         <div
           role="dialog"
@@ -48,7 +53,7 @@ const Modal = ({
             </button>
           )}
 
-          <div className="max-h-[88vh] overflow-y-auto p-5 pr-14 styled-scrollbar sm:p-6 sm:pr-16">
+          <div className="max-h-[88vh] overflow-y-auto p-5 pr-5 styled-scrollbar sm:p-6 sm:pr-10">
             {children}
           </div>
         </div>
