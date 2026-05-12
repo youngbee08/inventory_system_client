@@ -7,12 +7,14 @@ import Materials from "./pages/admin/Materials";
 import Reports from "./pages/admin/Reports";
 import Login from "./pages/general/auth/Login";
 import DashboardOverview from "./pages/user/Overview";
+import AssignedDeployments from "./pages/user/Deployments";
 import ProtectRoute from "./helpers/ProtectRoute";
 import NotFound from "./pages/general/NotFound";
 import Activities from "./pages/general/Activities";
 import SingleDeployment from "./pages/admin/SingleDeployment";
 import Settings from "./pages/general/Settings";
 import Notifications from "./pages/general/Notifications";
+import Employees from "./pages/admin/Employees";
 
 const App = () => {
   return (
@@ -26,6 +28,13 @@ const App = () => {
             path="/admin/overview"
             element={
               <MainLayout children={<Overview />} pageName="Admin Overview" />
+            }
+          />
+
+          <Route
+            path="/admin/employees"
+            element={
+              <MainLayout children={<Employees />} pageName="All employee" />
             }
           />
 
@@ -58,6 +67,16 @@ const App = () => {
               <MainLayout
                 children={<DashboardOverview />}
                 pageName="Employee Dashboard"
+              />
+            }
+          />
+
+          <Route
+            path="/dashboard/deployments"
+            element={
+              <MainLayout
+                children={<AssignedDeployments />}
+                pageName="Assigned Deployments"
               />
             }
           />

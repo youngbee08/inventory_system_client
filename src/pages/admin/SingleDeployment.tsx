@@ -1,5 +1,5 @@
 import type React from "react";
-import { Link, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import {
   MdArrowBack,
   MdEmail,
@@ -19,22 +19,23 @@ import { toast } from "sonner";
 import api, { getErrorMessage } from "../../helpers/api";
 import ActionCell from "../../components/common/ActionCell";
 import ConfirmDialog from "../../components/modals/ConfirmDialog";
+import { useUser } from "../../contexts/user/UserContext";
 
 const statusClasses: Record<DeploymentStatus, string> = {
-  pending: "bg-amber-50 text-amber-700 ring-amber-200",
-  in_transit: "bg-blue-50 text-blue-700 ring-blue-200",
-  completed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  cancelled: "bg-red-50 text-red-700 ring-red-200",
+  pending: "bg-amber-50/20 text-amber-700 ring-amber-200",
+  in_transit: "bg-blue-50/20 text-blue-700 ring-blue-200",
+  completed: "bg-emerald-50/20 text-emerald-700 ring-emerald-200",
+  cancelled: "bg-red-50/20 text-red-700 ring-red-200",
 };
 
 const materialStatusClasses: Record<string, string> = {
-  allocated: "bg-blue-50 text-blue-700 ring-blue-200",
-  in_transit: "bg-indigo-50 text-indigo-700 ring-indigo-200",
-  used: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  pending: "bg-amber-50 text-amber-700 ring-amber-200",
-  deployed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
-  returned: "bg-slate-50 text-slate-600 ring-slate-200",
-  cancelled: "bg-red-50 text-red-700 ring-red-200",
+  allocated: "bg-blue-50/20 text-blue-700 ring-blue-200",
+  in_transit: "bg-indigo-50/20 text-indigo-700 ring-indigo-200",
+  used: "bg-emerald-50/20 text-emerald-700 ring-emerald-200",
+  pending: "bg-amber-50/20 text-amber-700 ring-amber-200",
+  deployed: "bg-emerald-50/20 text-emerald-700 ring-emerald-200",
+  returned: "bg-slate-50/20 text-slate-600 ring-slate-200",
+  cancelled: "bg-red-50/20 text-red-700 ring-red-200",
 };
 
 const materialStatusFlow: Record<string, string | null> = {
@@ -157,33 +158,42 @@ const DeploymentState = ({
   message: string;
   actionLabel?: string;
   onAction?: () => void;
-}) => (
-  <main className="flex min-h-[55vh] items-center justify-center">
-    <section className="w-full max-w-lg text-center">
-      <h1 className="mt-5 text-lg font-extrabold text-tableHeading">{title}</h1>
-      <p className="mt-2 text-sm leading-6 text-tableData">{message}</p>
-      <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
-        <Link
-          to="/admin/deployments"
-          className="inline-flex h-10 items-center justify-center rounded-md border border-tableBorder bg-white px-4 text-xs font-bold text-tableHeading transition hover:bg-secondary"
-        >
-          Go Back
-        </Link>
-        {actionLabel && onAction && (
+}) => {
+  const navigate = useNavigate();
+
+  return (
+    <main className="flex min-h-[55vh] items-center justify-center">
+      <section className="w-full max-w-lg text-center">
+        <h1 className="mt-5 text-lg font-extrabold text-tableHeading">
+          {title}
+        </h1>
+        <p className="mt-2 text-sm leading-6 text-tableData">{message}</p>
+        <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-center">
           <button
-            type="button"
-            onClick={onAction}
-            className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90"
+            onClick={() => navigate(-1)}
+            className="inline-flex h-10 items-center justify-center rounded-md border border-tableBorder bg-white px-4 text-xs font-bold text-tableHeading transition hover:bg-secondary"
           >
-            {actionLabel}
+            Go Back
           </button>
-        )}
-      </div>
-    </section>
-  </main>
-);
+          {actionLabel && onAction && (
+            <button
+              type="button"
+              onClick={onAction}
+              className="inline-flex h-10 items-center justify-center rounded-md bg-primary px-4 text-xs font-bold text-white shadow-sm shadow-primary/20 transition hover:bg-primary/90"
+            >
+              {actionLabel}
+            </button>
+          )}
+        </div>
+      </section>
+    </main>
+  );
+};
 
 const SingleDeployment: React.FC = () => {
+  const navigate = useNavigate();
+  const { role } = useUser();
+
   const { id } = useParams();
   const [deployment, setDeployment] = useState<Deployment | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -275,19 +285,27 @@ const SingleDeployment: React.FC = () => {
     <main className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <Link
-            to="/admin/deployments"
-            className="inline-flex items-center gap-2 text-xs font-bold text-primary transition hover:text-primary/80"
+          <p
+            onClick={() => {
+              const deploymentsPath =
+                role === "admin"
+                  ? "/admin/deployments"
+                  : "/dashboard/deployments";
+
+              navigate(deploymentsPath);
+            }}
+            className="cursor-pointer inline-flex items-center gap-2 text-xs font-bold text-primary transition hover:text-primary/80"
           >
             <MdArrowBack size={16} />
             Back to deployments
-          </Link>
+          </p>
           <h1 className="mt-4 text-2xl font-extrabold text-tableHeading">
             {deployment?.title}
           </h1>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-tableData">
-            Review deployment destination, assigned employee, materials, and
-            operational timestamps.
+            {role === "admin"
+              ? "Review deployment destination, assigned employee, materials, and operational timestamps."
+              : "Review deployment destinations, assigned tasks, material details, and operational timelines."}
           </p>
         </div>
 

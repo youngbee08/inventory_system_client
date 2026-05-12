@@ -4,7 +4,7 @@ import type { IconType } from "react-icons";
 interface StatCardProps {
   title: string;
   value: string | number;
-  icon: IconType;
+  icon?: IconType;
   subtitle?: string;
 }
 
@@ -27,10 +27,11 @@ const StatCard = ({ title, value, icon: Icon, subtitle }: StatCardProps) => {
             <p className="mt-2 text-xs text-tableData/80">{subtitle}</p>
           )}
         </div>
-
-        <div className="flex h-14 w-14 items-center justify-center rounded-md bg-primary/10 text-primary">
-          <Icon size={24} />
-        </div>
+        {Icon && (
+          <div className="flex h-14 w-14 items-center justify-center rounded-md bg-primary/10 text-primary">
+            <Icon size={24} />
+          </div>
+        )}
       </div>
     </motion.article>
   );

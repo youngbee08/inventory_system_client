@@ -4,12 +4,14 @@ import ActivityList from "../../components/activity/ActivityList";
 import type { Activity } from "../../lib/interfaces";
 import api, { getErrorMessage } from "../../helpers/api";
 import PaginationControls from "../../utility/PaginationControls";
+import { useUser } from "../../contexts/user/UserContext";
 
 interface ActivitiesProps {
   isRecent?: boolean;
 }
 
 const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
+  const { role } = useUser();
   const [activities, setActivities] = useState<Activity[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -37,7 +39,7 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
     } catch (err: unknown) {
       setError(getErrorMessage(err, "Failed to load activities"));
     } finally {
-      setIsLoading(false);  
+      setIsLoading(false);
     }
   }, [currentPage, itemsPerPage]);
 
@@ -57,8 +59,9 @@ const Activities: React.FC<ActivitiesProps> = ({ isRecent = false }) => {
             Activity Log
           </h1>
           <p className="mt-2 text-sm leading-6 text-tableData">
-            Review inventory updates, deployment events, and system activity
-            across the workspace.
+            {role === "admin"
+              ? "Review inventory updates, deployment events, and system activity across the workspace."
+              : "Track your assigned deployments, material updates, and activity across your workspace."}
           </p>
         </div>
       )}
