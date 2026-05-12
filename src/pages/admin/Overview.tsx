@@ -9,6 +9,7 @@ import {
   formatCompactAmount,
   // formatNumberWithCommas,
 } from "../../utility/formatterUtilities";
+import { FiArrowUpRight } from "react-icons/fi";
 
 const Overview = () => {
   const { user,dashboardMetrics } = useUser();
@@ -71,9 +72,9 @@ const Overview = () => {
             action={
               <Link
                 to="/admin/deployments"
-                className="text-xs font-bold text-primary transition hover:text-primary/80"
+                className="text-xs font-bold text-primary transition hover:text-primary/80 flex items-center"
               >
-                View All
+                View All <FiArrowUpRight />
               </Link>
             }
           />
@@ -89,9 +90,9 @@ const Overview = () => {
             action={
               <Link
                 to="/general/activities"
-                className="text-xs font-bold text-primary transition hover:text-primary/80"
+                className="text-xs font-bold text-primary transition hover:text-primary/80 flex items-center"
               >
-                View All
+                View All <FiArrowUpRight />
               </Link>
             }
           />

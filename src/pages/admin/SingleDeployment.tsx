@@ -14,9 +14,11 @@ import {
   formatNumberWithCommas,
   formatUnderScores,
 } from "../../utility/formatterUtilities";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import api, { getErrorMessage } from "../../helpers/api";
+import ActionCell from "../../components/common/ActionCell";
+import ConfirmDialog from "../../components/modals/ConfirmDialog";
 
 const statusClasses: Record<DeploymentStatus, string> = {
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
@@ -27,16 +29,30 @@ const statusClasses: Record<DeploymentStatus, string> = {
 
 const materialStatusClasses: Record<string, string> = {
   allocated: "bg-blue-50 text-blue-700 ring-blue-200",
+  in_transit: "bg-indigo-50 text-indigo-700 ring-indigo-200",
+  used: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   pending: "bg-amber-50 text-amber-700 ring-amber-200",
   deployed: "bg-emerald-50 text-emerald-700 ring-emerald-200",
   returned: "bg-slate-50 text-slate-600 ring-slate-200",
   cancelled: "bg-red-50 text-red-700 ring-red-200",
 };
 
+const materialStatusFlow: Record<string, string | null> = {
+  allocated: "in_transit",
+  in_transit: "used",
+  used: null,
+};
+
 const getMaterialName = (material: Deployment["materials"][number]) => {
   return typeof material.material === "string"
     ? material.material
     : material.material.name;
+};
+
+const getMaterialId = (material: Deployment["materials"][number]) => {
+  return typeof material.material === "string"
+    ? material.material
+    : material.material._id;
 };
 
 const getMaterialMeta = (material: Deployment["materials"][number]) => {
@@ -172,6 +188,13 @@ const SingleDeployment: React.FC = () => {
   const [deployment, setDeployment] = useState<Deployment | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const [selectedMaterial, setSelectedMaterial] = useState<{
+    id: string;
+    name: string;
+    currentStatus: string;
+    nextStatus: string;
+  } | null>(null);
+  const [isUpdatingStatus, setIsUpdatingStatus] = useState(false);
 
   const assignedTo =
     typeof deployment?.assignedTo === "string" ? null : deployment?.assignedTo;
@@ -180,7 +203,7 @@ const SingleDeployment: React.FC = () => {
       ? deployment?.assignedTo
       : deployment?.assignedTo?.name;
 
-  const reFetchDeployment = async () => {
+  const reFetchDeployment = useCallback(async () => {
     if (!id) return;
 
     setIsLoading(true);
@@ -195,26 +218,36 @@ const SingleDeployment: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
-  useEffect(() => {
-    const fetchDeployment = async () => {
-      if (!id) return;
-
-      setIsLoading(true);
-      setError(null);
-      try {
-        const res = await api.get(`/deployments/${id}`);
-        setDeployment(res.data.deployment ?? null);
-      } catch (err: unknown) {
-        const message = getErrorMessage(err, "Failed to load deployment");
-        setError(message);
-        toast.error(message);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    fetchDeployment();
   }, [id]);
+
+  const updateMaterialStatus = async () => {
+    if (!id || !selectedMaterial) return;
+
+    setIsUpdatingStatus(true);
+    try {
+      const res = await api.patch(
+        `/deployments/${id}/materials/${selectedMaterial.id}/status`,
+        {
+          status: selectedMaterial.nextStatus,
+        },
+      );
+      toast.success(res.data.message || "Material status updated");
+      setSelectedMaterial(null);
+      await reFetchDeployment();
+    } catch (err: unknown) {
+      toast.error(getErrorMessage(err, "Failed to update material status"));
+    } finally {
+      setIsUpdatingStatus(false);
+    }
+  };
+
+  useEffect(() => {
+    const timeoutId = window.setTimeout(() => {
+      void reFetchDeployment();
+    }, 0);
+
+    return () => window.clearTimeout(timeoutId);
+  }, [reFetchDeployment]);
 
   if (isLoading) return <SingleDeploymentSkeleton />;
 
@@ -434,6 +467,7 @@ const SingleDeployment: React.FC = () => {
                   "Threshold",
                   "Location",
                   "Status",
+                  "Action",
                 ].map((heading) => (
                   <th
                     key={heading}
@@ -447,6 +481,8 @@ const SingleDeployment: React.FC = () => {
             <tbody>
               {deployment?.materials.map((material) => {
                 const meta = getMaterialMeta(material);
+                const materialId = getMaterialId(material);
+                const nextStatus = materialStatusFlow[material.status] ?? null;
 
                 return (
                   <tr
@@ -478,6 +514,28 @@ const SingleDeployment: React.FC = () => {
                         {formatUnderScores(material.status, true)}
                       </span>
                     </td>
+                    <td className="px-4 py-4">
+                      {nextStatus ? (
+                        <ActionCell
+                          rowId={materialId}
+                          otherAction={{
+                            label: `Mark ${formatUnderScores(nextStatus, true)}`,
+                            icon: PiTruck,
+                            action: () =>
+                              setSelectedMaterial({
+                                id: materialId,
+                                name: getMaterialName(material),
+                                currentStatus: material.status,
+                                nextStatus,
+                              }),
+                          }}
+                        />
+                      ) : (
+                        <span className="text-xs font-semibold text-tableData">
+                          Final
+                        </span>
+                      )}
+                    </td>
                   </tr>
                 );
               })}
@@ -485,6 +543,26 @@ const SingleDeployment: React.FC = () => {
           </table>
         </div>
       </section>
+
+      <ConfirmDialog
+        isOpen={Boolean(selectedMaterial)}
+        title="Update material status?"
+        message={
+          selectedMaterial
+            ? `${selectedMaterial.name} will move from ${formatUnderScores(
+                selectedMaterial.currentStatus,
+                true,
+              )} to ${formatUnderScores(
+                selectedMaterial.nextStatus,
+                true,
+              )}. This status change is irreversible and cannot be reverted.`
+            : ""
+        }
+        confirmText="Update Status"
+        onCancel={() => setSelectedMaterial(null)}
+        onConfirm={updateMaterialStatus}
+        isLoading={isUpdatingStatus}
+      />
     </main>
   );
 };

@@ -1,7 +1,7 @@
 import { PiPulse } from "react-icons/pi";
 import type { Activity } from "../../lib/interfaces";
 import {
-  getInitials,
+  formatISODateToCustom,
 } from "../../utility/formatterUtilities";
 import EmptyState from "../common/EmptyState";
 
@@ -12,10 +12,6 @@ interface ActivityListProps {
 
 const skeletonItems = Array.from({ length: 4 }, (_, index) => index);
 
-const getPerformerInitials = (name: string) => {
-  const [firstName = "System", lastName = "User"] = name.trim().split(" ");
-  return getInitials(firstName, lastName);
-};
 
 const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
   if (isLoading) {
@@ -45,24 +41,23 @@ const ActivityList = ({ activities, isLoading = false }: ActivityListProps) => {
   }
 
   return (
-    <div className="min-w-0 max-w-full space-y-4">
+    <div className="min-w-0 max-w-full flex flex-col gap-1">
       {activities.map((activity) => (
         <article
           key={activity._id}
-          className="flex min-w-0 gap-3 border-b border-tableBorder pb-4 last:border-b-0 last:pb-0"
+          className="flex min-w-0 gap-3 rounded-md border border-transparent border-b-tableBorder px-2 py-1 transition hover:border-tableBorder hover:bg-secondary last:border-b-transparent"
         >
-          <div className="grid size-9 shrink-0 place-items-center rounded-full bg-primary/10 text-[11px] font-extrabold text-primary">
-            {getPerformerInitials(activity.performedBy.name)}
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2">
-              <p className="min-w-0 text-xs font-semibold leading-5 text-tableHeading [overflow-wrap:anywhere]">
+          <div className="min-w-0 flex justify-between w-full">
+            <div className="flex  flex-col gap-0">
+              <p className="min-w-0 text-[10px] font-semibold leading-5 text-tableHeading [overflow-wrap:anywhere]">
                 {activity.message}
+              </p>
+              <p className="min-w-0 text-[10px] font-semibold leading-5 text-tableHeading [overflow-wrap:anywhere]">
+                Performed by : {activity.performedBy?.name}
               </p>
             </div>
             <p className="mt-1 text-[11px] font-medium text-tableData [overflow-wrap:anywhere]">
-              {activity.material} - {activity.createdAt}
+              {formatISODateToCustom(activity.createdAt)}
             </p>
           </div>
         </article>

@@ -40,9 +40,11 @@ export interface Activity {
   _id: string;
   action: string;
   message: string;
-  performedBy: SafeUserProps;
-  material: string;
+  performedBy: SafeUserProps | UserProps | null;
+  material?: string | Material | null;
+  deployment?: string | Deployment | null;
   createdAt: string;
+  updatedAt?: string;
 }
 
 export type DeploymentStatus =
@@ -53,6 +55,8 @@ export type DeploymentStatus =
 
 export type DeploymentMaterialStatus =
   | "allocated"
+  | "in_transit"
+  | "used"
   | "pending"
   | "deployed"
   | "returned"
